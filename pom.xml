@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>zatribune.spring.example</groupId>
+    <groupId>echchetoui</groupId>
     <artifactId>ecommerce</artifactId>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
@@ -13,10 +13,10 @@
     </description>
 
     <modules>
-        <module>ms-orders</module>
-        <module>ms-payment</module>
-        <module>commons</module>
-        <module>ms-stock</module>
+        <module>orders-service</module>
+        <module>payment-service</module>
+        <module>shared</module>
+        <module>stock-service</module>
     </modules>
 
     <properties>
