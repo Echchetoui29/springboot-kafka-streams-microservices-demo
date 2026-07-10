@@ -2,21 +2,30 @@ import { useState } from "react";
 import CustomerList from "./components/CustomerList";
 import ProductList from "./components/ProductList";
 import OrderForm from "./components/OrderForm";
+import OrderList from "./components/OrderList";
 import "./App.css";
 
 function App() {
-  const [lastOrder, setLastOrder] = useState(null);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  function handleOrderCreated() {
+    setRefreshKey((k) => k + 1);
+  }
 
   return (
     <section id="center">
-      <h1>New order</h1>
-      <OrderForm onOrderCreated={setLastOrder} />
-      {lastOrder && <p>Created order #{lastOrder.id} — status: {lastOrder.status}</p>}
+      <h1>Order Management</h1>
 
-      <h1>Customers</h1>
+      <h2>New order</h2>
+      <OrderForm onOrderCreated={handleOrderCreated} />
+
+      <h2>Orders</h2>
+      <OrderList refreshKey={refreshKey} />
+
+      <h2>Customers</h2>
       <CustomerList />
 
-      <h1>Products</h1>
+      <h2>Products</h2>
       <ProductList />
     </section>
   );

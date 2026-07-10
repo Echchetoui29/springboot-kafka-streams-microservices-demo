@@ -35,7 +35,7 @@ public class DevBootstrap implements CommandLineRunner {
                 .amountReserved(0)
                 .build();
 
-        Customer p2=Customer.builder().name("Muhammad Ali")
+        Customer p2=Customer.builder().name("Echchetoui Tariq")
                 .amountAvailable(8000)
                 .amountReserved(0)
                 .build();

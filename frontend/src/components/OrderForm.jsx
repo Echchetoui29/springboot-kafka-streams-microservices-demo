@@ -1,9 +1,14 @@
 import { useEffect, useState } from "react";
 import { getCustomers } from "../services/customersApi";
 import { getProducts } from "../services/productsApi";
-import { createOrder } from "../services/ordersApi";
+import { createOrder, getOrder } from "../services/ordersApi";
+import { useToast } from "./ToastProvider";
+
+const POLL_INTERVAL_MS = 1500;
+const POLL_MAX_ATTEMPTS = 20;
 
 export default function OrderForm({ onOrderCreated }) {
+  const showToast = useToast();
   const [customers, setCustomers] = useState([]);
   const [products, setProducts] = useState([]);
   const [customerId, setCustomerId] = useState("");
@@ -11,16 +16,34 @@ export default function OrderForm({ onOrderCreated }) {
   const [productCount, setProductCount] = useState(1);
   const [price, setPrice] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState(null);
+  const [pendingOrder, setPendingOrder] = useState(null);
 
   useEffect(() => {
-    getCustomers().then(setCustomers).catch((e) => setError(e.message));
-    getProducts().then(setProducts).catch((e) => setError(e.message));
-  }, []);
+    getCustomers().then(setCustomers).catch((e) => showToast(`Failed to load customers: ${e.message}`));
+    getProducts().then(setProducts).catch((e) => showToast(`Failed to load products: ${e.message}`));
+  }, [showToast]);
+
+  async function pollUntilFinal(id) {
+    for (let attempt = 0; attempt < POLL_MAX_ATTEMPTS; attempt++) {
+      await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
+      let order;
+      try {
+        order = await getOrder(id);
+      } catch {
+        continue;
+      }
+      setPendingOrder(order);
+      if (order.status !== "NEW") {
+        onOrderCreated?.(order);
+        return;
+      }
+    }
+    showToast(`Order ${id} is still processing after ${POLL_MAX_ATTEMPTS * POLL_INTERVAL_MS / 1000}s`);
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
-    setError(null);
+    setPendingOrder(null);
     setSubmitting(true);
     try {
       const order = await createOrder({
@@ -30,11 +53,13 @@ export default function OrderForm({ onOrderCreated }) {
         price: Number(price),
         status: "NEW",
       });
+      setPendingOrder(order);
       onOrderCreated?.(order);
       setProductCount(1);
       setPrice("");
+      pollUntilFinal(order.id);
     } catch (e) {
-      setError(e.message);
+      showToast(e.message);
     } finally {
       setSubmitting(false);
     }
@@ -45,7 +70,7 @@ export default function OrderForm({ onOrderCreated }) {
       <label>
         Customer
         <select value={customerId} onChange={(e) => setCustomerId(e.target.value)} required>
-          <option value="" disabled>Select customer</option>
+          <option value="" disabled>-- choose --</option>
           {customers.map((c) => (
             <option key={c.id} value={c.id}>{c.name} (available: {c.amountAvailable})</option>
           ))}
@@ -55,7 +80,7 @@ export default function OrderForm({ onOrderCreated }) {
       <label>
         Product
         <select value={productId} onChange={(e) => setProductId(e.target.value)} required>
-          <option value="" disabled>Select product</option>
+          <option value="" disabled>-- choose --</option>
           {products.map((p) => (
             <option key={p.id} value={p.id}>{p.name} (stock: {p.availableItems})</option>
           ))}
@@ -88,7 +113,12 @@ export default function OrderForm({ onOrderCreated }) {
         {submitting ? "Creating..." : "Create order"}
       </button>
 
-      {error && <p className="error">Error: {error}</p>}
+      {pendingOrder && (
+        <p>
+          Order #{pendingOrder.id} — status: {pendingOrder.status}
+          {pendingOrder.status === "NEW" && " (processing...)"}
+        </p>
+      )}
     </form>
   );
 }
