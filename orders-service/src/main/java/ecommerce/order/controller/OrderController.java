@@ -12,12 +12,11 @@ import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.config.StreamsBuilderFactoryBean;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.support.SendResult;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -40,23 +39,52 @@ public class OrderController {
     }
 
     @PostMapping
-    public Order create(@RequestBody Order order) throws ExecutionException, InterruptedException {
+    public Order create(@RequestBody Order order) {
+        validate(order);
         order.setId(id.incrementAndGet());
         order.setStatus(OrderStatus.NEW);
         log.info("Sent: {}", order);
-        return kafkaTemplate.send(Topics.ORDERS, order.getId(), order).get().getProducerRecord().value();
+        try {
+            return kafkaTemplate.send(Topics.ORDERS, order.getId(), order).get().getProducerRecord().value();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException("interrupted while publishing order", e);
+        } catch (ExecutionException e) {
+            throw new IllegalStateException("failed to publish order", e.getCause());
+        }
     }
 
     @GetMapping
     public List<Order> all() {
         List<Order> orders = new ArrayList<>();
-        ReadOnlyKeyValueStore<Long, Order> store = kafkaStreamsFactory
+        KeyValueIterator<Long, Order> it = store().all();
+        it.forEachRemaining(kv -> orders.add(kv.value));
+        return orders;
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Order> get(@PathVariable Long id) {
+        Order order = store().get(id);
+        return order == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(order);
+    }
+
+    private ReadOnlyKeyValueStore<Long, Order> store() {
+        return kafkaStreamsFactory
                 .getKafkaStreams()
                 .store(StoreQueryParameters.fromNameAndType(
                         Topics.ORDERS,
                         QueryableStoreTypes.keyValueStore()));
-        KeyValueIterator<Long, Order> it = store.all();
-        it.forEachRemaining(kv -> orders.add(kv.value));
-        return orders;
+    }
+
+    private void validate(Order order) {
+        if (order.getCustomerId() == null || order.getProductId() == null) {
+            throw new IllegalArgumentException("customerId and productId are required");
+        }
+        if (order.getPrice() <= 0) {
+            throw new IllegalArgumentException("price must be positive");
+        }
+        if (order.getProductCount() <= 0) {
+            throw new IllegalArgumentException("productCount must be positive");
+        }
     }
 }
