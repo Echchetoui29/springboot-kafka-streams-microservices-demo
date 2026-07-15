@@ -3,6 +3,13 @@ import { getOrders } from "../services/ordersApi";
 import { getCustomers } from "../services/customersApi";
 import { getProducts } from "../services/productsApi";
 
+const BADGE_CLASS = {
+  NEW: "badge-new",
+  CONFIRMED: "badge-confirmed",
+  REJECTED: "badge-rejected",
+  ROLLBACK: "badge-rollback",
+};
+
 export default function OrderList({ refreshKey }) {
   const [orders, setOrders] = useState([]);
   const [customerNames, setCustomerNames] = useState({});
@@ -22,35 +29,40 @@ export default function OrderList({ refreshKey }) {
       .finally(() => setLoading(false));
   }, [refreshKey]);
 
-  if (loading) return <p>Loading orders...</p>;
+  if (loading) return <p className="muted">Loading orders...</p>;
   if (error) return <p className="error">Error: {error}</p>;
+  if (orders.length === 0) return <p className="muted">No orders yet — create one above.</p>;
 
   return (
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Customer</th>
-          <th>Product</th>
-          <th>Qty</th>
-          <th>Price</th>
-          <th>Status</th>
-          <th>Created</th>
-        </tr>
-      </thead>
-      <tbody>
-        {orders.map((o) => (
-          <tr key={o.id}>
-            <td>{o.id}</td>
-            <td>{customerNames[o.customerId] ?? o.customerId}</td>
-            <td>{productNames[o.productId] ?? o.productId}</td>
-            <td>{o.productCount}</td>
-            <td>{o.price}</td>
-            <td>{o.status}</td>
-            <td>{o.createdAt ? new Date(o.createdAt).toLocaleString() : "-"}</td>
+    <div className="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Customer</th>
+            <th>Product</th>
+            <th>Qty</th>
+            <th>Price</th>
+            <th>Status</th>
+            <th>Created</th>
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {orders.map((o) => (
+            <tr key={o.id}>
+              <td>{o.id}</td>
+              <td>{customerNames[o.customerId] ?? o.customerId}</td>
+              <td>{productNames[o.productId] ?? o.productId}</td>
+              <td>{o.productCount}</td>
+              <td>{o.price}</td>
+              <td>
+                <span className={`badge ${BADGE_CLASS[o.status] ?? "badge-new"}`}>{o.status}</span>
+              </td>
+              <td>{o.createdAt ? new Date(o.createdAt).toLocaleString() : "-"}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }

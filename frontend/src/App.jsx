@@ -21,21 +21,37 @@ function App() {
 
   return (
     <section id="center">
-      <h1>Order Management</h1>
+      <header className="app-header">
+        <h1>Order Management</h1>
+      </header>
 
-      <h2>New order</h2>
-      <OrderForm onOrderCreated={handleOrderCreated} catalogRefreshKey={catalogRefreshKey} />
+      <section className="card">
+        <h2>New order</h2>
+        <OrderForm onOrderCreated={handleOrderCreated} catalogRefreshKey={catalogRefreshKey} />
+      </section>
 
-      <h2>Orders</h2>
-      <OrderList refreshKey={ordersRefreshKey + catalogRefreshKey} />
+      <div className="row-split">
+        <section className="card">
+          <h2>Customers</h2>
+          <CustomerForm onCustomerCreated={handleCatalogChanged} />
+          <div className="list-wrap">
+            <CustomerList refreshKey={catalogRefreshKey + ordersRefreshKey} />
+          </div>
+        </section>
 
-      <h2>Customers</h2>
-      <CustomerForm onCustomerCreated={handleCatalogChanged} />
-      <CustomerList refreshKey={catalogRefreshKey} />
+        <section className="card">
+          <h2>Products</h2>
+          <ProductForm onProductCreated={handleCatalogChanged} />
+          <div className="list-wrap">
+            <ProductList refreshKey={catalogRefreshKey + ordersRefreshKey} />
+          </div>
+        </section>
+      </div>
 
-      <h2>Products</h2>
-      <ProductForm onProductCreated={handleCatalogChanged} />
-      <ProductList refreshKey={catalogRefreshKey} />
+      <section className="card">
+        <h2>Orders</h2>
+        <OrderList refreshKey={ordersRefreshKey + catalogRefreshKey} />
+      </section>
     </section>
   );
 }
