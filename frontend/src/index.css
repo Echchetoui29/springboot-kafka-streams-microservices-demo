@@ -1,27 +1,31 @@
 :root {
-  --bg: #f5f6f7;
-  --surface: #ffffff;
-  --border: #d8dce1;
-  --code-bg: #eef0f2;
-
+  --text: #475569;
   --text-h: #0f172a;
-  --text: #334155;
-  --text-muted: #64748b;
+  --text-muted: #94a3b8;
+  --bg: #f1f5f9;
+  --surface: #ffffff;
+  --border: #e2e8f0;
+  --code-bg: #f8fafc;
 
-  --accent: #0b6e63;
+  --accent: #0f6b66;
+  --accent-bg: rgba(15, 107, 102, 0.08);
+  --accent-border: rgba(15, 107, 102, 0.35);
   --accent-contrast: #ffffff;
 
-  --success: #166534;
-  --success-bg: #f0fdf4;
-  --warning: #92400e;
-  --warning-bg: #fffbeb;
-  --danger: #991b1b;
-  --danger-bg: #fef2f2;
-  --neutral: #475569;
-  --neutral-bg: #eef0f2;
+  --success: #15803d;
+  --success-bg: rgba(21, 128, 61, 0.1);
+  --warning: #b45309;
+  --warning-bg: rgba(180, 83, 9, 0.1);
+  --danger: #b91c1c;
+  --danger-bg: rgba(185, 28, 28, 0.1);
+  --neutral: #57534e;
+  --neutral-bg: rgba(87, 83, 78, 0.08);
 
-  --radius-sm: 4px;
-  --radius-md: 6px;
+  --shadow-sm: 0 1px 2px rgba(28, 25, 23, 0.04);
+  --shadow-md: 0 4px 12px rgba(28, 25, 23, 0.06), 0 1px 3px rgba(28, 25, 23, 0.06);
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
 
   --space-1: 4px;
   --space-2: 8px;
@@ -45,26 +49,30 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #0b0f14;
-    --surface: #12171d;
-    --border: #232b33;
-    --code-bg: #182028;
-
+    --text: #94a3b8;
     --text-h: #f1f5f9;
-    --text: #cbd5e1;
-    --text-muted: #7c8896;
+    --text-muted: #64748b;
+    --bg: #0f172a;
+    --surface: #1a2436;
+    --border: #2d3a50;
+    --code-bg: #17223a;
 
-    --accent: #14b8a6;
-    --accent-contrast: #0b0f14;
+    --accent: #2dd4bf;
+    --accent-bg: rgba(45, 212, 191, 0.12);
+    --accent-border: rgba(45, 212, 191, 0.4);
+    --accent-contrast: #17151a;
 
     --success: #4ade80;
-    --success-bg: #0f1f16;
+    --success-bg: rgba(74, 222, 128, 0.12);
     --warning: #fbbf24;
-    --warning-bg: #241c0a;
+    --warning-bg: rgba(251, 191, 36, 0.12);
     --danger: #f87171;
-    --danger-bg: #240d0d;
+    --danger-bg: rgba(248, 113, 113, 0.12);
     --neutral: #a8a29e;
-    --neutral-bg: #182028;
+    --neutral-bg: rgba(168, 162, 158, 0.12);
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35), 0 1px 3px rgba(0, 0, 0, 0.3);
   }
 }
 
@@ -108,7 +116,7 @@ code {
   font-family: var(--mono);
   font-size: 13px;
   padding: 2px 6px;
-  border-radius: var(--radius-sm);
+  border-radius: 4px;
   background: var(--code-bg);
   color: var(--text-h);
 }
