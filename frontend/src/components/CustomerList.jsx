@@ -13,29 +13,32 @@ export default function CustomerList({ refreshKey }) {
       .finally(() => setLoading(false));
   }, [refreshKey]);
 
-  if (loading) return <p>Loading customers...</p>;
+  if (loading) return <p className="muted">Loading customers...</p>;
   if (error) return <p className="error">Error: {error}</p>;
+  if (customers.length === 0) return <p className="muted">No customers yet.</p>;
 
   return (
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Name</th>
-          <th>Available</th>
-          <th>Reserved</th>
-        </tr>
-      </thead>
-      <tbody>
-        {customers.map((c) => (
-          <tr key={c.id}>
-            <td>{c.id}</td>
-            <td>{c.name}</td>
-            <td>{c.amountAvailable}</td>
-            <td>{c.amountReserved}</td>
+    <div className="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Available</th>
+            <th>Reserved</th>
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {customers.map((c) => (
+            <tr key={c.id}>
+              <td>{c.id}</td>
+              <td>{c.name}</td>
+              <td>{c.amountAvailable}</td>
+              <td>{c.amountReserved}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }

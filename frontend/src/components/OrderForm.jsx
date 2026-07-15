@@ -7,6 +7,13 @@ import { useToast } from "./ToastProvider";
 const POLL_INTERVAL_MS = 1500;
 const POLL_MAX_ATTEMPTS = 20;
 
+const BADGE_CLASS = {
+  NEW: "badge-new",
+  CONFIRMED: "badge-confirmed",
+  REJECTED: "badge-rejected",
+  ROLLBACK: "badge-rollback",
+};
+
 export default function OrderForm({ onOrderCreated, catalogRefreshKey }) {
   const showToast = useToast();
   const [customers, setCustomers] = useState([]);
@@ -66,6 +73,7 @@ export default function OrderForm({ onOrderCreated, catalogRefreshKey }) {
   }
 
   return (
+    <>
     <form onSubmit={handleSubmit}>
       <label>
         Customer
@@ -112,13 +120,17 @@ export default function OrderForm({ onOrderCreated, catalogRefreshKey }) {
       <button type="submit" disabled={submitting}>
         {submitting ? "Creating..." : "Create order"}
       </button>
-
-      {pendingOrder && (
-        <p>
-          Order #{pendingOrder.id} — status: {pendingOrder.status}
-          {pendingOrder.status === "NEW" && " (processing...)"}
-        </p>
-      )}
     </form>
+
+    {pendingOrder && (
+      <p className="muted list-wrap">
+        Order #{pendingOrder.id} —{" "}
+        <span className={`badge ${BADGE_CLASS[pendingOrder.status] ?? "badge-new"}`}>
+          {pendingOrder.status}
+        </span>
+        {pendingOrder.status === "NEW" && " (processing...)"}
+      </p>
+    )}
+    </>
   );
 }
