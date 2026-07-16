@@ -5,6 +5,7 @@ import { useToast } from "./ToastProvider";
 export default function ProductForm({ onProductCreated }) {
   const showToast = useToast();
   const [name, setName] = useState("");
+  const [price, setPrice] = useState("");
   const [availableItems, setAvailableItems] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -14,10 +15,12 @@ export default function ProductForm({ onProductCreated }) {
     try {
       const product = await createProduct({
         name,
+        price: Number(price),
         availableItems: Number(availableItems),
       });
       onProductCreated?.(product);
       setName("");
+      setPrice("");
       setAvailableItems("");
     } catch (e) {
       showToast(e.message);
@@ -31,6 +34,17 @@ export default function ProductForm({ onProductCreated }) {
       <label>
         Name
         <input value={name} onChange={(e) => setName(e.target.value)} required />
+      </label>
+
+      <label>
+        Unit price
+        <input
+          type="number"
+          min="1"
+          value={price}
+          onChange={(e) => setPrice(e.target.value)}
+          required
+        />
       </label>
 
       <label>

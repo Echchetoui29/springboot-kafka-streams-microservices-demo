@@ -22,7 +22,6 @@ export default function OrderForm({ onOrderCreated, catalogRefreshKey }) {
   const [customerId, setCustomerId] = useState("");
   const [productId, setProductId] = useState("");
   const [productCount, setProductCount] = useState(1);
-  const [price, setPrice] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [pendingOrder, setPendingOrder] = useState(null);
 
@@ -30,6 +29,9 @@ export default function OrderForm({ onOrderCreated, catalogRefreshKey }) {
     getCustomers().then(setCustomers).catch((e) => showToast(`Failed to load customers: ${e.message}`));
     getProducts().then(setProducts).catch((e) => showToast(`Failed to load products: ${e.message}`));
   }, [showToast, catalogRefreshKey]);
+
+  const selectedProduct = products.find((p) => String(p.id) === String(productId));
+  const totalPrice = selectedProduct ? selectedProduct.price * Number(productCount || 0) : 0;
 
   async function pollUntilFinal(id) {
     for (let attempt = 0; attempt < POLL_MAX_ATTEMPTS; attempt++) {
@@ -62,13 +64,12 @@ export default function OrderForm({ onOrderCreated, catalogRefreshKey }) {
         customerId: Number(customerId),
         productId: Number(productId),
         productCount: Number(productCount),
-        price: Number(price),
+        price: totalPrice,
         status: "NEW",
       });
       setPendingOrder(order);
       onOrderCreated?.(order);
       setProductCount(1);
-      setPrice("");
       pollUntilFinal(order.id);
     } catch (e) {
       showToast(e.message);
@@ -101,7 +102,7 @@ export default function OrderForm({ onOrderCreated, catalogRefreshKey }) {
           placeholder="Select a product"
           options={products.map((p) => ({
             value: p.id,
-            label: `${p.name} (stock: ${p.availableItems})`,
+            label: `${p.name} (unit price: ${p.price}, stock: ${p.availableItems})`,
           }))}
         />
       </label>
@@ -118,14 +119,8 @@ export default function OrderForm({ onOrderCreated, catalogRefreshKey }) {
       </label>
 
       <label>
-        Price
-        <input
-          type="number"
-          min="1"
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
-          required
-        />
+        Total price
+        <input type="number" value={totalPrice} disabled />
       </label>
 
       <button type="submit" disabled={submitting}>

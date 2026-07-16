@@ -24,6 +24,7 @@ export default function ProductList({ refreshKey }) {
           <tr>
             <th>ID</th>
             <th>Name</th>
+            <th>Price</th>
             <th>Available</th>
             <th>Reserved</th>
           </tr>
@@ -33,6 +34,7 @@ export default function ProductList({ refreshKey }) {
             <tr key={p.id}>
               <td>{p.id}</td>
               <td>{p.name}</td>
+              <td>{p.price}</td>
               <td>{p.availableItems}</td>
               <td>{p.reservedItems}</td>
             </tr>

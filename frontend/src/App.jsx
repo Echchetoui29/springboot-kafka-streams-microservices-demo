@@ -25,10 +25,7 @@ function App() {
         <h1>Order Management</h1>
       </header>
 
-      <section className="card">
-        <h2>New order</h2>
-        <OrderForm onOrderCreated={handleOrderCreated} catalogRefreshKey={catalogRefreshKey} />
-      </section>
+     
 
       <div className="row-split">
         <section className="card">
@@ -47,6 +44,11 @@ function App() {
           </div>
         </section>
       </div>
+
+       <section className="card">
+        <h2>New order</h2>
+        <OrderForm onOrderCreated={handleOrderCreated} catalogRefreshKey={catalogRefreshKey} />
+      </section>
 
       <section className="card">
         <h2>Orders</h2>
