@@ -37,6 +37,9 @@ public class ProductController {
         if (product.getAvailableItems() < 0) {
             throw new IllegalArgumentException("availableItems must be >= 0");
         }
+        if (product.getPrice() <= 0) {
+            throw new IllegalArgumentException("price must be > 0");
+        }
         product.setId(null);
         product.setReservedItems(0);
         return repository.save(product);
