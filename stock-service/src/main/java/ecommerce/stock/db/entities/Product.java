@@ -19,6 +19,7 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+    private int price;
     private int availableItems;
     private int reservedItems;
 
@@ -27,6 +28,7 @@ public class Product {
         return "Product{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
+                ", price=" + price +
                 ", availableItems=" + availableItems +
                 ", reservedItems=" + reservedItems +
                 '}';

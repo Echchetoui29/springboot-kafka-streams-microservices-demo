@@ -3,6 +3,7 @@ import { getCustomers } from "../services/customersApi";
 import { getProducts } from "../services/productsApi";
 import { createOrder, getOrder } from "../services/ordersApi";
 import { useToast } from "./ToastProvider";
+import Select from "./Select";
 
 const POLL_INTERVAL_MS = 1500;
 const POLL_MAX_ATTEMPTS = 20;
@@ -21,7 +22,6 @@ export default function OrderForm({ onOrderCreated, catalogRefreshKey }) {
   const [customerId, setCustomerId] = useState("");
   const [productId, setProductId] = useState("");
   const [productCount, setProductCount] = useState(1);
-  const [price, setPrice] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [pendingOrder, setPendingOrder] = useState(null);
 
@@ -29,6 +29,9 @@ export default function OrderForm({ onOrderCreated, catalogRefreshKey }) {
     getCustomers().then(setCustomers).catch((e) => showToast(`Failed to load customers: ${e.message}`));
     getProducts().then(setProducts).catch((e) => showToast(`Failed to load products: ${e.message}`));
   }, [showToast, catalogRefreshKey]);
+
+  const selectedProduct = products.find((p) => String(p.id) === String(productId));
+  const totalPrice = selectedProduct ? selectedProduct.price * Number(productCount || 0) : 0;
 
   async function pollUntilFinal(id) {
     for (let attempt = 0; attempt < POLL_MAX_ATTEMPTS; attempt++) {
@@ -50,6 +53,10 @@ export default function OrderForm({ onOrderCreated, catalogRefreshKey }) {
 
   async function handleSubmit(e) {
     e.preventDefault();
+    if (!customerId || !productId) {
+      showToast("Select a customer and a product first");
+      return;
+    }
     setPendingOrder(null);
     setSubmitting(true);
     try {
@@ -57,13 +64,12 @@ export default function OrderForm({ onOrderCreated, catalogRefreshKey }) {
         customerId: Number(customerId),
         productId: Number(productId),
         productCount: Number(productCount),
-        price: Number(price),
+        price: totalPrice,
         status: "NEW",
       });
       setPendingOrder(order);
       onOrderCreated?.(order);
       setProductCount(1);
-      setPrice("");
       pollUntilFinal(order.id);
     } catch (e) {
       showToast(e.message);
@@ -77,22 +83,28 @@ export default function OrderForm({ onOrderCreated, catalogRefreshKey }) {
     <form onSubmit={handleSubmit}>
       <label>
         Customer
-        <select value={customerId} onChange={(e) => setCustomerId(e.target.value)} required>
-          <option value="" disabled>-- which customer? --</option>
-          {customers.map((c) => (
-            <option key={c.id} value={c.id}>{c.name} (available: {c.amountAvailable})</option>
-          ))}
-        </select>
+        <Select
+          value={customerId}
+          onChange={setCustomerId}
+          placeholder="Select a customer"
+          options={customers.map((c) => ({
+            value: c.id,
+            label: `${c.name} (available: ${c.amountAvailable})`,
+          }))}
+        />
       </label>
-
+ 
       <label>
         Product
-        <select value={productId} onChange={(e) => setProductId(e.target.value)} required>
-          <option value="" disabled>-- which product? --</option>
-          {products.map((p) => (
-            <option key={p.id} value={p.id}>{p.name} (stock: {p.availableItems})</option>
-          ))}
-        </select>
+        <Select
+          value={productId}
+          onChange={setProductId}
+          placeholder="Select a product"
+          options={products.map((p) => ({
+            value: p.id,
+            label: `${p.name} (unit price: ${p.price}, stock: ${p.availableItems})`,
+          }))}
+        />
       </label>
 
       <label>
@@ -102,17 +114,6 @@ export default function OrderForm({ onOrderCreated, catalogRefreshKey }) {
           min="1"
           value={productCount}
           onChange={(e) => setProductCount(e.target.value)}
-          required
-        />
-      </label>
-
-      <label>
-        Price
-        <input
-          type="number"
-          min="1"
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
           required
         />
       </label>

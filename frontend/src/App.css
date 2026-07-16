@@ -7,8 +7,15 @@
 
 .app-header {
   margin-bottom: var(--space-6);
-  padding-bottom: var(--space-4);
-  border-bottom: 1px solid var(--border);
+  padding: var(--space-4) var(--space-6);
+  background: var(--nav-bg);
+  border-bottom: 3px solid var(--accent);
+  border-radius: var(--radius);
+  text-align: center;
+}
+
+.app-header h1 {
+  color: var(--nav-text);
 }
 
 .card {
@@ -27,7 +34,7 @@
 
 .row-split {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 4fr 5fr;
   gap: var(--space-6);
 }
 
@@ -57,10 +64,10 @@ form label {
   font-size: 13px;
   font-weight: 500;
   color: var(--text);
-  flex: 1 1 160px;
+  flex: 1 1 110px;
+  min-width: 0;
 }
 
-form select,
 form input {
   font: inherit;
   font-size: 14px;
@@ -71,28 +78,115 @@ form input {
   color: var(--text-h);
 }
 
-form select:focus,
 form input:focus {
   outline: none;
-  border-color: var(--accent);
+  border-color: #e77600;
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+/* custom select */
+
+.select {
+  position: relative;
+  width: 100%;
+}
+
+.select-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-h);
+  cursor: pointer;
+}
+
+.select-trigger[aria-expanded="true"] {
+  outline: none;
+  border-color: #e77600;
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.select-value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.select-placeholder {
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.select-arrow {
+  color: var(--text-muted);
+  font-size: 11px;
+  flex-shrink: 0;
+}
+
+.select-list {
+  position: absolute;
+  z-index: 10;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  max-height: 240px;
+  overflow-y: auto;
+  margin: 0;
+  padding: var(--space-1) 0;
+  list-style: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.select-option {
+  padding: 8px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.select-option:hover {
+  background: var(--code-bg);
+}
+
+.select-option-selected {
+  color: var(--link);
+  font-weight: 600;
+}
+
+.select-empty {
+  padding: 8px 12px;
+  font-size: 14px;
+  color: var(--text-muted);
 }
 
 form button {
   font: inherit;
-  font-size: 13px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  font-size: 14px;
+  font-weight: 500;
   padding: 8px 18px;
   border-radius: var(--radius);
-  border: 1px solid var(--accent);
-  background: var(--accent);
+  border: 1px solid var(--accent-border);
+  background: linear-gradient(to bottom, #f7dfa5, var(--accent));
   color: var(--accent-contrast);
   cursor: pointer;
   white-space: nowrap;
 
   &:hover:not(:disabled) {
-    opacity: 0.85;
+    background: var(--accent);
   }
   &:disabled {
     opacity: 0.5;
