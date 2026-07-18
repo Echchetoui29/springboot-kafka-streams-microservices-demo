@@ -10,8 +10,6 @@ import org.springframework.test.context.ActiveProfiles;
 @EmbeddedKafka(partitions = 1)
 class OrderApplicationTests {
 
-    @Test
-    void contextLoads() {
-    }
-
+  @Test
+  void contextLoads() {}
 }
